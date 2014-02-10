@@ -1,0 +1,5 @@
+
+# querying the ncloc of sonar-cxx project
+http://localhost:9000/api/resources?resource=org.codehaus.sonar-plugins.cxx:cxx&metrics=it_coverage
+ncloc
+
