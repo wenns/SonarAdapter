@@ -8,6 +8,12 @@
   <artifactId>SonarAdapter</artifactId>
   <version>1.0</version>
 
+  <name>SonarAdapter</name>
+  <inceptionYear>2014</inceptionYear>
+  <organization>
+    <name>UQASAR Consortium</name>
+  </organization>
+
   <dependencies>
     <dependency>
       <groupId>uQasarAdapter</groupId>

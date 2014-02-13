@@ -11,8 +11,8 @@ The wrapper will be provided as a jar archive.
 Usage
 =====
 To query a Sonar instnance, the platform has to:
-- instantiate the Class ..., providing the address and the credentials
-needed for accessing this instance. This data is not persisted inside
+- instantiate the class SonarAdapter, providing the address and the credentials
+needed for accessing a Sonar instance. This data is not persisted inside
 the wrapper. 
 - For querying, the plafform calls a method on the adapter.
 - Error handling: in the error case, the wrapper tries to recover
@@ -22,9 +22,7 @@ not successfull, an exception is thrown.
 
 The interface
 =============
-First question when designing such an interface is: 
-should it be syncronous or asynchronous. For simplicity we choose the
-first alternative.
+First of all; it should be obviously synchronous.
 
 To query a metric from Sonar, we need following data:
 - Metric name
@@ -56,26 +54,7 @@ Alternatives for webservice querying libs include:
 - Apache HTTPcomponents
 - java.net.URL
 
-
 Returning the Result
 --------------------
 The query result has to be parsed and returned as a UQuasar-specific
 object (Measurement?).
-
-
-Notes about the INTRA proposal 
-==============================
-- The wrapper as proposed is too heavy
-- Probably we're on the same line here, but just to be sure:
-* The adapter interface is owned by the platform, no?
-
-This BindedSystem aspect is IMO not part of the interface. 
-
-Most of the content of the model should be moved to the platform?
-The platform should own the interface and 
-
-I understand, that you've 
-
-
-
-
