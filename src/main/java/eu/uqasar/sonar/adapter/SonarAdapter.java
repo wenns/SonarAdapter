@@ -32,10 +32,16 @@ public class SonarAdapter implements SystemAdapter {
       put(uQasarMetric.TEST_SUCCESS_DENSITY, "test_success_density");
     }};
   
+  Requester requester = new DefaultRequester();
+  
   public SonarAdapter(String host, String port) {
     this.host = host;
     this.port = port;
     queryTemplate = "http://" + host + ":" + port + "/api/resources?resource=";
+  }
+
+  public void injectRequester(Requester requester){
+    this.requester = requester;
   }
   
   @Override
@@ -46,10 +52,17 @@ public class SonarAdapter implements SystemAdapter {
     // Parse the resulting json. The structure of the response should be
     // static, so the following static approach should suffice
     JSONArray jsonArray = new JSONArray(querySonar(query));
-    String result = JSONObject.valueToString(jsonArray.getJSONObject(0)
-                                             .getJSONArray("msr")
-                                             .getJSONObject(0)
-                                             .get("val"));
+    String result = null;
+    if(jsonArray.length() != 0){
+      JSONObject firstObj = jsonArray.getJSONObject(0);
+      if (firstObj != null){
+        result = JSONObject.valueToString(firstObj.getJSONArray("msr")
+                                          .getJSONObject(0)
+                                          .get("val"));
+        
+      }
+    }
+
     measurements.add(new Measurement(metric, result));
     return measurements;
   }
@@ -62,31 +75,8 @@ public class SonarAdapter implements SystemAdapter {
     return sonarMetricName;
   }
   
-  private String querySonar(String query) throws uQasarException{
-    String result;
 
-    System.out.println(query);
-    
-    URL url;
-    try{
-      url = new URL(query);
-    } catch(java.net.MalformedURLException e){
-      // TODO: encapsulate the original exception
-      throw new uQasarException("query is invalid");
-    }
-    
-    try{
-      InputStream is = url.openStream();
-      try {
-        result = IOUtils.toString(is, "UTF-8");
-      } finally {
-        is.close();
-      }
-    } catch(IOException oie) {
-      // TODO: encapsulate the original exception
-      throw new uQasarException("querying failed");
-    }
-    
-    return result;
+  private String querySonar(String query) throws uQasarException{
+    return requester.fetch(query);
   }
 }

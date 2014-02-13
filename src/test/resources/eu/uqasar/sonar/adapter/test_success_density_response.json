@@ -1,0 +1,22 @@
+[
+    {
+        "id":323,
+        "key":"org.codehaus.sonar-plugins.cxx:cxx",
+        "name":"Cxx",
+        "scope":"PRJ",
+        "qualifier":"TRK",
+        "date":"2014-01-09T21:06:14+0100",
+        "lname":"Cxx",
+        "lang":"java",
+        "version":"1.0-SNAPSHOT",
+        "description":"",
+        "msr":
+        [
+            {
+                "key":"test_success_density",
+                "val":100.0,
+                "frmt_val":"100.0%"
+            }
+        ]
+    }
+]
