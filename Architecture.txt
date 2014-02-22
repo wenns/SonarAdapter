@@ -29,8 +29,7 @@ To query a metric from Sonar, we need following data:
 - The object to query the metric of. Although Sonar provides the
 metrics data down to the files level, we contraint it to be a project
 (at least for now...). The object has to be specified using an
-according Sonar identifier. Question: how does Uquasar know the
-mapping uquasar project -> sonar project??
+according Sonar identifier. 
 
 
 The implementation
@@ -38,12 +37,21 @@ The implementation
 
 Parameter mapping & assemblying the query
 -----------------------------------------
-First, the metric and the object identifier has to be mapped to
-the Sonar world. We do it as follows:
+First, the metric and the project name have to be mapped to
+the according names/objects in the Sonar world. We do it as follows:
 * Metric name: the wrapper has the build-in knowledge for doing
 that. It can be configurable (via a properties file or something) or
 be just hardcoded.
-* Object id: Sonar uses the term 'resource' for every object which has
+* The Project name: The adapter will assume that it has been already
+given the according Sonar name. To query a metric, we have to use
+projects key, however. So, part of the adapters job is to map the
+given name to a key. This can be done by quering all projects in the
+Sonar instance along with their names and keys and building up a
+suitable lookup data structure. Following aspects should be looked at,
+while doing this:
+- Names can be ambigous. To handle this,  
+
+Sonar uses the term 'resource' for every object which has
 attached metrics data, including a project. So, to identify a project,
 we have to specify the resource using the syntax
 "resource=<project_key>" inside the query.

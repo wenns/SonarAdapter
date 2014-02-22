@@ -3,18 +3,13 @@ package eu.uqasar.sonar.adapter;
 import eu.uqasar.adapter.SystemAdapter;
 import eu.uqasar.adapter.exception.uQasarException;
 import eu.uqasar.adapter.model.*;
-import org.apache.commons.io.IOUtils;
 
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.io.InputStream;
-import java.io.IOException;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import java.lang.String;
 
 public class SonarAdapter implements SystemAdapter {
   private String host;
@@ -32,7 +27,7 @@ public class SonarAdapter implements SystemAdapter {
       put(uQasarMetric.TEST_SUCCESS_DENSITY, "test_success_density");
     }};
   
-  Requester requester = new DefaultRequester();
+  private Requester requester = new DefaultRequester();
   
   public SonarAdapter(String host, String port) {
     this.host = host;
@@ -59,7 +54,6 @@ public class SonarAdapter implements SystemAdapter {
         result = JSONObject.valueToString(firstObj.getJSONArray("msr")
                                           .getJSONObject(0)
                                           .get("val"));
-        
       }
     }
 
@@ -75,7 +69,6 @@ public class SonarAdapter implements SystemAdapter {
     return sonarMetricName;
   }
   
-
   private String querySonar(String query) throws uQasarException{
     return requester.fetch(query);
   }
