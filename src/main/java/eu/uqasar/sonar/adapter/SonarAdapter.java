@@ -73,14 +73,26 @@ public class SonarAdapter implements SystemAdapter {
     return requester.fetch(query);
   }
 
+  private static String usage(){
+    return "Usage: <callable> <hostname> <port> <project name> <metric>";
+  }
+  
   public static void main(String[] argv){
     System.out.println("called!");
     
-    String projName = "org.codehaus.sonar-plugins.cxx:cxx";
+    if(argv.length != 4){
+      System.out.println(usage());
+      System.exit(1);
+    }
     
-    SonarAdapter adapter = new SonarAdapter("localhost", "9000");
+    String hostname = argv[0];
+    String port = argv[1];
+    String projectName = argv[2];
+    String metric = argv[3];
+    
+    SonarAdapter adapter = new SonarAdapter(hostname, port);
     try{
-      List<Measurement> result = adapter.query(projName, uQasarMetric.NCLOC);
+      List<Measurement> result = adapter.query(projectName, uQasarMetric.NCLOC);
       System.out.println(result);
     } catch(uQasarException u){
       System.out.println("BOOM!: " + u);

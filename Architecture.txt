@@ -49,7 +49,17 @@ given name to a key. This can be done by quering all projects in the
 Sonar instance along with their names and keys and building up a
 suitable lookup data structure. Following aspects should be looked at,
 while doing this:
-- Names can be ambigous. To handle this,  
+- Names can be ambigous. To handle this, one can think on following
+solutions:
+  - use the project key instead. Problem: the key is not accessible
+  from the UI.
+  - throw an Exception and force the user to resolve the ambiguity 
+  in Sonar
+  - If the ambiguity case becomes to common, use a pair name-version
+
+
+
+
 
 Sonar uses the term 'resource' for every object which has
 attached metrics data, including a project. So, to identify a project,
