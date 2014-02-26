@@ -72,4 +72,18 @@ public class SonarAdapter implements SystemAdapter {
   private String querySonar(String query) throws uQasarException{
     return requester.fetch(query);
   }
+
+  public static void main(String[] argv){
+    System.out.println("called!");
+    
+    String projName = "org.codehaus.sonar-plugins.cxx:cxx";
+    
+    SonarAdapter adapter = new SonarAdapter("localhost", "9000");
+    try{
+      List<Measurement> result = adapter.query(projName, uQasarMetric.NCLOC);
+      System.out.println(result);
+    } catch(uQasarException u){
+      System.out.println("BOOM!: " + u);
+    }
+  }
 }

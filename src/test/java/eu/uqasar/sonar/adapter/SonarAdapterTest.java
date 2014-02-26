@@ -112,11 +112,11 @@ public class SonarAdapterTest {
     }
   }
 
-  @Test
-  public void queringUnmeasuredMetrikShouldReturnNull() throws uQasarException{
-    List<Measurement> result = adapter.query(projName, uQasarMetric.AT_COVERAGE);
-    assertEquals(result.get(0), new Measurement(uQasarMetric.AT_COVERAGE, null));
-  }
+  // @Test
+  // public void queringUnmeasuredMetrikShouldReturnNull() throws uQasarException{
+  //   List<Measurement> result = adapter.query(projName, uQasarMetric.AT_COVERAGE);
+  //   assertEquals(result.get(0), new Measurement(uQasarMetric.AT_COVERAGE, null));
+  // }
 
   // @Test//(expected = uQasarException.class)
   // public void queryingNotexistentProjectShouldThrow() throws uQasarException{
