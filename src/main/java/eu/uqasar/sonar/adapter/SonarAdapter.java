@@ -3,6 +3,9 @@ package eu.uqasar.sonar.adapter;
 import eu.uqasar.adapter.SystemAdapter;
 import eu.uqasar.adapter.exception.uQasarException;
 import eu.uqasar.adapter.model.*;
+import eu.uqasar.adapter.query.QueryExpression;
+import eu.uqasar.adapter.model.BindedSystem;
+import java.net.URI;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,27 +43,22 @@ public class SonarAdapter implements SystemAdapter {
   }
   
   @Override
-  public List<Measurement> query(String project, uQasarMetric metric) throws uQasarException {
-    List<Measurement> measurements = new LinkedList<Measurement>();
-    String query = queryTemplate + project + "&metrics=" + mapMetricName(metric);
-    
-    // Parse the resulting json. The structure of the response should be
-    // static, so the following static approach should suffice
-    JSONArray jsonArray = new JSONArray(querySonar(query));
-    String result = null;
-    if(jsonArray.length() != 0){
-      JSONObject firstObj = jsonArray.getJSONObject(0);
-      if (firstObj != null){
-        result = JSONObject.valueToString(firstObj.getJSONArray("msr")
-                                          .getJSONObject(0)
-                                          .get("val"));
-      }
-    }
-
-    measurements.add(new Measurement(metric, result));
+  public List<Measurement> query(BindedSystem bindedSystem, User user, QueryExpression queryExpression) throws uQasarException {
+    URI uri = null;
+    LinkedList<Measurement> measurements = new LinkedList<Measurement>();
     return measurements;
   }
-
+  
+  @Override
+  public List<Measurement> query(String url, String credentials, String queryExpression) throws uQasarException {
+    BindedSystem sonarInst = new BindedSystem(0, url, 0);
+    
+    String[] creds = credentials.split(":");
+    User user = new User(creds[0], creds[1]);
+    
+    return query(sonarInst, user, new SonarQueryExpression(queryExpression));
+  }
+  
   private String mapMetricName(uQasarMetric metric) throws uQasarException{
     String sonarMetricName = UQMETRIC_TO_SONARMETRIC.get(metric);
     if(sonarMetricName == null){
@@ -90,12 +88,12 @@ public class SonarAdapter implements SystemAdapter {
     String projectName = argv[2];
     String metric = argv[3];
     
-    SonarAdapter adapter = new SonarAdapter(hostname, port);
-    try{
-      List<Measurement> result = adapter.query(projectName, uQasarMetric.NCLOC);
-      System.out.println(result);
-    } catch(uQasarException u){
-      System.out.println("BOOM!: " + u);
-    }
+    // SonarAdapter adapter = new SonarAdapter(hostname, port);
+    // try{
+    //   List<Measurement> result = adapter.query(projectName, uQasarMetric.NCLOC);
+    //   System.out.println(result);
+    // } catch(uQasarException u){
+    //   System.out.println("BOOM!: " + u);
+    // }
   }
 }
