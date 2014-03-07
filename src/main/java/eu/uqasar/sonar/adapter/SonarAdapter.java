@@ -2,98 +2,152 @@ package eu.uqasar.sonar.adapter;
 
 import eu.uqasar.adapter.SystemAdapter;
 import eu.uqasar.adapter.exception.uQasarException;
-import eu.uqasar.adapter.model.*;
-import eu.uqasar.adapter.query.QueryExpression;
 import eu.uqasar.adapter.model.BindedSystem;
-import java.net.URI;
+import eu.uqasar.adapter.model.Measurement;
+import eu.uqasar.adapter.model.User;
+import eu.uqasar.adapter.model.uQasarMetric;
+import eu.uqasar.adapter.query.QueryExpression;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.json.JSONObject;
-import org.json.JSONArray;
 
+/**
+ * {@inheritDoc}
+ */
 public class SonarAdapter implements SystemAdapter {
-  private String host;
-  private String port;
-  private String queryTemplate;
-  static final Map<uQasarMetric, String> UQMETRIC_TO_SONARMETRIC
-    = new TreeMap<uQasarMetric, String>() {{
-      put(uQasarMetric.NCLOC, "ncloc");
-      put(uQasarMetric.STATEMENTS, "statements");
-      put(uQasarMetric.DUPLICATED_LINES, "duplicated_lines");
-      put(uQasarMetric.DUPLICATED_LINES_DENSITY, "duplicated_lines_density");
-      put(uQasarMetric.COMPLEXITY, "complexity");
-      put(uQasarMetric.UT_COVERAGE, "coverage");
-      put(uQasarMetric.AT_COVERAGE, "it_coverage");
-      put(uQasarMetric.TEST_SUCCESS_DENSITY, "test_success_density");
-    }};
-  
-  private Requester requester = new DefaultRequester();
-  
-  public SonarAdapter(String host, String port) {
-    this.host = host;
-    this.port = port;
-    queryTemplate = "http://" + host + ":" + port + "/api/resources?resource=";
+  private static final Map<String, String> UQMETRIC_TO_SONARMETRIC = new TreeMap<String, String>() {
+    {
+      put("NCLOC", "ncloc");
+      put("STATEMENTS", "statements");
+      put("DUPLICATED_LINES", "duplicated_lines");
+      put("DUPLICATED_LINES_DENSITY", "duplicated_lines_density");
+      put("COMPLEXITY", "complexity");
+      put("UT_COVERAGE", "coverage");
+      put("AT_COVERAGE", "it_coverage");
+      put("TEST_SUCCESS_DENSITY", "test_success_density");
+    }
+  };
+
+  private static final Map<String, uQasarMetric> UQM_NAME_TO_VALUE = new TreeMap<String, uQasarMetric>() {
+    {
+      for (uQasarMetric uqm : uQasarMetric.values()) {
+        put(uqm.name(), uqm);
+      }
+    }
+  };
+
+  private static final List<String> FIELDS_TO_STRIP =
+      Arrays.asList("id", "scope", "qualifier", "creationDate",
+          "lname", "lang", "version", "description", "date");
+
+  private Requester requester;
+
+  /**
+   * The one and only way to create a SonarAdapter
+   */
+  public SonarAdapter() {
+    requester = new DefaultRequester();
   }
 
-  public void injectRequester(Requester requester){
+  /**
+   * Inject the given requester to be used insted of the default one.
+   */
+  public void injectRequester(Requester requester) {
     this.requester = requester;
   }
-  
+
   @Override
-  public List<Measurement> query(BindedSystem bindedSystem, User user, QueryExpression queryExpression) throws uQasarException {
-    URI uri = null;
+  public List<Measurement> query(BindedSystem system, User user, QueryExpression expr) throws uQasarException {
     LinkedList<Measurement> measurements = new LinkedList<Measurement>();
+    String query = system.getUri() + "/api/resources?metrics=";
+
+    List<String> metricsToQuery = Arrays.asList(expr.getQuery().split(","));
+    for (String metric : metricsToQuery) {
+      String responce = querySonar(query + mapMetricName(metric));
+
+      JSONArray jsonArray = new JSONArray(responce);
+      JSONArray res = new JSONArray();
+
+      for (int i = 0; i < jsonArray.length(); i++) {
+        JSONObject jb = stripJSON(jsonArray.getJSONObject(i));
+        res.put(jb);
+      }
+
+      measurements.add(new Measurement(UQM_NAME_TO_VALUE.get(metric), res.toString()));
+    }
+
     return measurements;
   }
-  
+
   @Override
-  public List<Measurement> query(String url, String credentials, String queryExpression) throws uQasarException {
-    BindedSystem sonarInst = new BindedSystem(0, url, 0);
-    
-    String[] creds = credentials.split(":");
-    User user = new User(creds[0], creds[1]);
-    
-    return query(sonarInst, user, new SonarQueryExpression(queryExpression));
+  public List<Measurement> query(String url, String credentials, String expr) throws uQasarException {
+    String username = null;
+    String passwd = null;
+    if (credentials != null && !credentials.equals("")) {
+      String[] creds = credentials.split(":");
+      username = creds[0];
+      passwd = creds[1];
+    }
+
+    return query(new BindedSystem(0, url, 0), new User(username, passwd), new SonarQueryExpression(expr));
   }
-  
-  private String mapMetricName(uQasarMetric metric) throws uQasarException{
+
+  private JSONObject stripJSON(JSONObject sonarJson) {
+    // strip all sonar specific, unnecessary stuff from the json object
+    for (String key : FIELDS_TO_STRIP) {
+      sonarJson.remove(key);
+    }
+
+    JSONArray measures = sonarJson.getJSONArray("msr");
+    if (measures != null) {
+      sonarJson.put("value", measures.getJSONObject(0).get("val"));
+      sonarJson.remove("msr");
+    }
+
+    return sonarJson;
+  }
+
+  private String mapMetricName(String metric) throws uQasarException {
     String sonarMetricName = UQMETRIC_TO_SONARMETRIC.get(metric);
-    if(sonarMetricName == null){
+    if (sonarMetricName == null) {
       throw new uQasarException(String.format("The UASAR metric %s is unknown in SonarQube", metric));
     }
     return sonarMetricName;
   }
-  
-  private String querySonar(String query) throws uQasarException{
+
+  private String querySonar(String query) throws uQasarException {
     return requester.fetch(query);
   }
 
-  private static String usage(){
-    return "Usage: <callable> <hostname> <port> <project name> <metric>";
+  private static String usage() {
+    return "Usage: <callable> <url> <metric>";
   }
-  
-  public static void main(String[] argv){
-    System.out.println("called!");
-    
-    if(argv.length != 4){
+
+  /**
+   * This implements a rudimentary command line access (for testing and
+   * demostrating purposes)
+   */
+  public static void main(String[] argv) {
+    if (argv.length != 2) {
       System.out.println(usage());
       System.exit(1);
     }
-    
-    String hostname = argv[0];
-    String port = argv[1];
-    String projectName = argv[2];
-    String metric = argv[3];
-    
-    // SonarAdapter adapter = new SonarAdapter(hostname, port);
-    // try{
-    //   List<Measurement> result = adapter.query(projectName, uQasarMetric.NCLOC);
-    //   System.out.println(result);
-    // } catch(uQasarException u){
-    //   System.out.println("BOOM!: " + u);
-    // }
+
+    String url = argv[0];
+    String metric = argv[1];
+
+    SonarAdapter adapter = new SonarAdapter();
+    try {
+      List<Measurement> result = adapter.query(url, null, metric);
+      System.out.println("** Query successfull, result: **");
+      System.out.println(result.get(0));
+    } catch (uQasarException u) {
+      System.out.println("Error quering Sonar: " + u);
+    }
   }
 }

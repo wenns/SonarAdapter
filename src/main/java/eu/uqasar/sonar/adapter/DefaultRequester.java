@@ -1,39 +1,39 @@
 package eu.uqasar.sonar.adapter;
 
-import java.io.InputStream;
-import java.io.IOException;
-import org.apache.commons.io.IOUtils;
-import java.net.URL;
 import eu.uqasar.adapter.exception.uQasarException;
+import org.apache.commons.io.IOUtils;
 
-public class DefaultRequester implements Requester{
-  public String fetch(String query) throws uQasarException{
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+/**
+ * That one implements fetching data from Sonar using HTTP
+ */
+public class DefaultRequester implements Requester {
+  /**
+   * {@inheritDoc}
+   */
+  public String fetch(String query) throws uQasarException {
     String result;
-    URL url;
-    //System.out.println(query);
-    try{
+    URL url = null;
+    try {
       url = new URL(query);
-    } catch(java.net.MalformedURLException e){
-      // TODO: encapsulate the original exception
-      throw new uQasarException("query is invalid");
+    } catch (java.net.MalformedURLException e) {
+      throw new uQasarException("The query is invalid, details: ", e);
     }
-    
-    try{
+
+    try {
       InputStream is = url.openStream();
       try {
         result = IOUtils.toString(is, "UTF-8");
       } finally {
         is.close();
       }
-    } catch(IOException oie) {
-      // TODO: encapsulate the original exception
-      throw new uQasarException("querying failed");
+    } catch (IOException oie) {
+      throw new uQasarException("Reading the responce failed, details: ", oie);
     }
-    
-    // System.out.println(query);
-    // System.out.println("--->");
-    // System.out.println("!!" + result);
-    
+
     return result;
   }
 }
