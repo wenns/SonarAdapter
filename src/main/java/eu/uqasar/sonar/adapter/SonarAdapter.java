@@ -55,7 +55,7 @@ public class SonarAdapter implements SystemAdapter {
   }
 
   /**
-   * Inject the given requester to be used insted of the default one.
+   * Inject the given requester to be used instead of the default one.
    */
   public void injectRequester(Requester requester) {
     this.requester = requester;
@@ -64,7 +64,11 @@ public class SonarAdapter implements SystemAdapter {
   @Override
   public List<Measurement> query(BindedSystem system, User user, QueryExpression expr) throws uQasarException {
     LinkedList<Measurement> measurements = new LinkedList<Measurement>();
-    String query = system.getUri() + "/api/resources?metrics=";
+    String query = system.getUri();
+    if(!query.endsWith("/")){
+      query += "/";
+    }
+    query += "api/resources?metrics=";
 
     List<String> metricsToQuery = Arrays.asList(expr.getQuery().split(","));
     for (String metric : metricsToQuery) {
@@ -125,7 +129,7 @@ public class SonarAdapter implements SystemAdapter {
   }
 
   private static String usage() {
-    return "Usage: <callable> <url> <metric>";
+    return "Usage: java -jar SonarAdapter-1.0.jar <url> <metric>";
   }
 
   /**
