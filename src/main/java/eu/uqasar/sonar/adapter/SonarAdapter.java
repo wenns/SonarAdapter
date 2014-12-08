@@ -23,13 +23,30 @@ public class SonarAdapter implements SystemAdapter {
   private static final Map<String, String> UQMETRIC_TO_SONARMETRIC = new TreeMap<String, String>() {
     {
       put("NCLOC", "ncloc");
+      put("LINES", "lines");
       put("STATEMENTS", "statements");
+      put("CLASSES", "classes");
+      put("FILES", "files");
+      put("DIRECTORIES", "directories");
+      put("FUNCTIONS", "functions");
+      put("COMMENT_LINES_DENSITY", "comment_lines_density");
+      put("COMMENT_LINES", "comment_lines");
       put("DUPLICATED_LINES", "duplicated_lines");
       put("DUPLICATED_LINES_DENSITY", "duplicated_lines_density");
       put("COMPLEXITY", "complexity");
+      put("FUNCTION_COMPLEXITY", "function_complexity");
+      put("FILE_COMPLEXITY", "file_complexity");
+      put("CLASS_COMPLEXITY", "class_complexity");
+      put("VIOLATIONS", "violations");
       put("UT_COVERAGE", "coverage");
       put("AT_COVERAGE", "it_coverage");
+      put("OVERALL_COVERAGE", "overall_coverage");
+      put("PACKAGE_TANGLE_INDEX", "package_tangle_index");
+      put("PACKAGE_TANGLES", "package_tangles");
       put("TEST_SUCCESS_DENSITY", "test_success_density");
+      put("TEST_FAILURES", "test_failures");
+      put("TEST_ERRORS", "test_errors");
+      put("TESTS", "tests");
     }
   };
 
