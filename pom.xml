@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>SonarAdapter</groupId>
   <artifactId>SonarAdapter</artifactId>
   <version>1.0</version>
@@ -20,13 +20,13 @@
       <artifactId>uQasarAdapter</artifactId>
       <version>1.0</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.6.4</version>
     </dependency>
-    
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -40,19 +40,25 @@
     </dependency>
 
     <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20131018</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <version>1.9.0</version>
     </dependency>
-    
+
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -81,8 +87,9 @@
               <includes>
                 <include>org.json:json</include>
                 <include>commons-io:commons-io</include>
+                <include>commons-codec:commons-codec</include>
                 <include>uQasarAdapter:uQasarAdapter</include>
-                
+
                 <!-- <include>org.slf4j:slf4j-api</include> -->
                 <!-- <include>org.slf4j:jcl-over-slf4j</include> -->
                 <!-- <include>ch.qos.logback:logback-classic</include> -->
@@ -97,15 +104,15 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
           <encoding>UTF-8</encoding>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>

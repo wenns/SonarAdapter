@@ -20,6 +20,14 @@ import java.util.TreeMap;
  * {@inheritDoc}
  */
 public class SonarAdapter implements SystemAdapter {
+
+  public class SonarQueryExpression extends QueryExpression{
+    public SonarQueryExpression(String query){
+      super(query);
+    }
+  }
+
+
   private static final Map<String, String> UQMETRIC_TO_SONARMETRIC = new TreeMap<String, String>() {
     {
       put("NCLOC", "ncloc");
@@ -89,7 +97,8 @@ public class SonarAdapter implements SystemAdapter {
 
     List<String> metricsToQuery = Arrays.asList(expr.getQuery().split(","));
     for (String metric : metricsToQuery) {
-      String responce = querySonar(query + mapMetricName(metric));
+      String responce = querySonar(query + mapMetricName(metric),
+                                   user.getUsername(), user.getPassword());
 
       JSONArray jsonArray = new JSONArray(responce);
       JSONArray res = new JSONArray();
@@ -141,12 +150,12 @@ public class SonarAdapter implements SystemAdapter {
     return sonarMetricName;
   }
 
-  private String querySonar(String query) throws uQasarException {
-    return requester.fetch(query);
+  private String querySonar(String query, String login, String passwd) throws uQasarException {
+    return requester.fetch(query, login, passwd);
   }
 
   private static String usage() {
-    return "Usage: java -jar SonarAdapter-1.0.jar <url> <metric>";
+    return "Usage: java -jar SonarAdapter-1.0.jar <url> <metric> <login> <password>";
   }
 
   /**
@@ -154,17 +163,19 @@ public class SonarAdapter implements SystemAdapter {
    * demostrating purposes)
    */
   public static void main(String[] argv) {
-    if (argv.length != 2) {
+    if (argv.length != 4) {
       System.out.println(usage());
       System.exit(1);
     }
 
     String url = argv[0];
     String metric = argv[1];
+    String login = argv[2];
+    String passwd = argv[3];
 
     SonarAdapter adapter = new SonarAdapter();
     try {
-      List<Measurement> result = adapter.query(url, null, metric);
+      List<Measurement> result = adapter.query(url, login + ":" + passwd, metric);
       System.out.println("** Query successfull, result: **");
       System.out.println(result.get(0));
     } catch (uQasarException u) {

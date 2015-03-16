@@ -26,7 +26,7 @@ public class SonarAdapterTest {
 
   private Requester mockThrowingRequester() {
     Requester requester = new Requester() {
-      public String fetch(String query) throws uQasarException {
+      public String fetch(String query, String login, String user) throws uQasarException {
         throw new uQasarException("some message");
       }
     };
@@ -35,7 +35,7 @@ public class SonarAdapterTest {
 
   private Requester mockEmptySonar() throws uQasarException {
     Requester mockedRequester = mock(Requester.class);
-    when(mockedRequester.fetch(anyString())).thenReturn("[]");
+    when(mockedRequester.fetch(anyString(), anyString(), anyString())).thenReturn("[]");
     return mockedRequester;
   }
 
@@ -43,28 +43,28 @@ public class SonarAdapterTest {
     Requester mockedRequester = mock(Requester.class);
 
     when(mockedRequester
-        .fetch(matches(".*metrics=it_coverage")))
+        .fetch(matches(".*metrics=it_coverage"), anyString(), anyString()))
         .thenReturn("[]"); // that one is unmeasured
     when(mockedRequester
-        .fetch(matches(".*metrics=ncloc")))
+        .fetch(matches(".*metrics=ncloc"), anyString(), anyString()))
         .thenReturn(fromResource("ncloc_response.json"));
     when(mockedRequester
-        .fetch(matches(".*metrics=statements")))
+        .fetch(matches(".*metrics=statements"), anyString(), anyString()))
         .thenReturn(fromResource("statements_response.json"));
     when(mockedRequester
-        .fetch(matches(".*metrics=duplicated_lines")))
+        .fetch(matches(".*metrics=duplicated_lines"), anyString(), anyString()))
         .thenReturn(fromResource("duplicated_lines_response.json"));
     when(mockedRequester
-        .fetch(matches(".*metrics=duplicated_lines_density")))
+         .fetch(matches(".*metrics=duplicated_lines_density"), anyString(), anyString()))
         .thenReturn(fromResource("duplicated_lines_density_response.json"));
     when(mockedRequester
-        .fetch(matches(".*metrics=complexity")))
+        .fetch(matches(".*metrics=complexity"), anyString(), anyString()))
         .thenReturn(fromResource("complexity_response.json"));
     when(mockedRequester
-        .fetch(matches(".*metrics=coverage")))
+        .fetch(matches(".*metrics=coverage"), anyString(), anyString()))
         .thenReturn(fromResource("coverage_response.json"));
     when(mockedRequester
-        .fetch(matches(".*metrics=test_success_density")))
+        .fetch(matches(".*metrics=test_success_density"), anyString(), anyString()))
         .thenReturn(fromResource("test_success_density_response.json"));
 
     return mockedRequester;

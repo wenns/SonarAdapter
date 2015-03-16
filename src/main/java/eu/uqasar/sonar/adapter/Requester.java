@@ -8,6 +8,8 @@ import eu.uqasar.adapter.exception.uQasarException;
 interface Requester {
   /**
    * @param query The query to use when fetching data
+   * @param login The login to use when authentificating by SonarQube
+   * @param passwd The password to use when authentificating by SonarQube
    */
-  String fetch(String query) throws uQasarException;
+  String fetch(String query, String login, String passwd) throws uQasarException;
 }
