@@ -6,7 +6,7 @@
 
   <groupId>SonarAdapter</groupId>
   <artifactId>SonarAdapter</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 
   <name>SonarAdapter</name>
   <inceptionYear>2014</inceptionYear>
